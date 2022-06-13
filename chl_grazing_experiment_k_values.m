@@ -1,0 +1,681 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matlab script for calculation of the k values (apparent growth rate)
+% obtained during dilution (grazing) experiments.
+% 
+% Create a new table for each cruise gathering all the caluclated k-values
+% (apparent groth rates) for each tretment and flter type.
+% The duration of each incuabtion is calculated from the date_time_utc_end
+% and the date_time_utc_start for each experiment.
+% All the triplicate T0 Chl-a conc are calculated (only the one with
+% iode_quality_flag = 1).
+% k are caluclated from each TF values. Up to 6 k values are then obatined
+% for each treatment (dilution/nutrient/light) and filter type (>0&<200, 
+% >10&<200, >0 and >0&<10 ).
+% Based on >0&200 (GFF) and >10&<200 (10um filters, u10 = up 10), 
+% >0&<10 (d10 = down 10) Chl-a values are calculated and then corresponding
+% k values. For each triplicate, Chl-a d10 triplcate values are calculated
+% as the diffrenece between the mean Chl-a value on >0&<200 and individual
+% triplicate Chl-a values of >10&<200. Only dat with QC = 1 are considered. 
+% If Chl-a d10 <0, then Chl-a conc and k = NaN.
+% 
+%
+% Input: CRUSIE-chl-grazing-experiments-clean.csv files
+%
+% Outputs: CRUISE-chla-grazing-experiments-k-values.csv files.
+%
+% Written by Pierre Marrec
+%
+% pmarrec@uri.edu
+%
+% 5/26/2022
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clearvars, clc, close all
+
+% Set the directory where we work
+rep = 'C:\Users\pierr\Desktop\NES-LTER_Chla_Cleaning_Rates_Computation\';
+% Set the directory where the input raw data are
+rep1 = strcat(rep,'chl-grazing-experiment-clean\');
+% Set the directory where the output clean data are
+rep2 = strcat(rep,'chl-grazing-experiment-k-values\');
+
+% Find all the *.cnv files
+ext='*.csv';
+chemin = fullfile(rep1,ext);
+list = dir(chemin);% List all files of interest in the directory
+
+for n1=1:numel(list)
+    % load the .csv file of the corresponding cruise
+    tablename=strcat(rep1,list(n1).name);
+    T1=readtable(tablename);
+
+    % Create a table for each cruise to store the individual k-values
+    % For each cast/niskin, 6 rows if replicate bottles a and b, 9 rows if
+    % replicate bottles a, b anc c (from AR66).
+    % The number of colums depends on the number of treatments (nutrient, light)
+    % and on the filter types (>0&<200, >0&<200, but also >0 for EN627-L11-B and
+    % >0&<10 for EN668.
+    
+    % Only consider the TF values
+    b0=strcmp(T1.T0_TF,'TF');
+    % Get the number of station/depth (cast/niskin) sampled during the
+    % cruise
+    [c1,C1,C2]=findgroups(T1.cast(b0),T1.niskin(b0));
+    % Get the number of replicate bottles (if a0=2, 6 rows per station/depth, if
+    % a0=3, 9 columns per station/depth
+    a0=unique(T1.replicate_bottle(b0));
+    if length(a0)==2
+        nrow=6;
+    elseif length(a0)==3
+        nrow=9;
+    end
+
+    % Start with a table T2 with the good nb of rows and with only 4 variables:
+    % crusie, cast. niskin, and dilution = observed dilution based on GFF
+    % samples. Extra columns for the k values for each treatment will be
+    % added later
+    T2=table('Size',[length(C1)*nrow 4],'VariableTypes',...
+        {'string','string','string','double'},...
+        'VariableNames',{'cruise','cast','niskin','dilution'});
+
+
+    % Erase the extra " ' " in T1.cast and T1.niskin
+    T1.cast=erase(T1.cast,"'");
+    T1.niskin=erase(T1.niskin,"'");
+
+    % Identify each unique cast
+    a1=unique(T1.cast);
+
+    % Set up a loop counter for indexing the unique cast/depth
+    cnt1 = 0;
+
+    % Find the rows corresponding to the corresponding cast
+    for n2=1:length(a1)
+        b1=strcmp(T1.cast,a1(n2));
+        % for each cast, identify the unique sampling depth
+        a2=unique(T1.niskin(b1));
+        for n3=1:length(a2)
+
+            cnt1 = cnt1 +1;
+
+            b2=b1 & strcmp(T1.niskin,a2(n3));
+            % Duration of the incubation
+            B2 = find(b2, 1, 'first');%find the first occurence of b2=1
+            T2_start=(cnt1*nrow-(nrow-1));%Define where to store the first value for this given cast/depth
+            T2_end=(cnt1*nrow);%Define where to store the last value for this given cast/depth
+            Tinc=datenum(T1.date_time_utc_end(B2))-datenum(T1.date_time_utc_start(B2));
+            % Correpsonding cruise/cast/niskin
+            T2.cruise(T2_start:T2_end)=T1.cruise(B2);
+            T2.cast(T2_start:T2_end)=T1.cast(B2);
+            T2.niskin(T2_start:T2_end)=T1.niskin(B2);
+
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % >0&<200 filters (GFF)
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Mean Chl-a T0 dil >0&<200
+            % Identify all values obtained with >0&<200 filters at T0 dil
+            % with a iode_quality_flag = 1
+            c1=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'dil') & T1.iode_quality_flag==1;
+            chl_T0_dil=mean(T1.chl(c1));
+            % Mean Chl-a T0 wsw >0&<200
+            c2=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'wsw') & T1.iode_quality_flag==1;
+            chl_T0_wsw=mean(T1.chl(c2));
+            % Dilution level
+            T2.dilution(T2_start:T2_end)=chl_T0_dil/chl_T0_wsw;
+            % k-values dil High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_HL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_HL(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_HL(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_HL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_HL(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_HL(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw + N High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_HL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_HL(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_HL(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values dil Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_LL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_LL(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_LL(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_LL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_LL(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_LL(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw N Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_LL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_LL(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_LL(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % >10&<200 filters (10um) k_u10um
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Mean Chl-a T0 dil >10&<200
+            % Identify all values obtained with >10&<200 filters at T0 dil
+            % with a iode_quality_flag = 1
+            c1=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'dil') & T1.iode_quality_flag==1;
+            chl_T0_dil_u10um=mean(T1.chl(c1));
+            % Mean Chl-a T0 wsw >10&<200
+            c2=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'wsw') & T1.iode_quality_flag==1;
+            chl_T0_wsw_u10um=mean(T1.chl(c2));
+            % k-values dil High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_HL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil_u10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_HL_u10um(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_HL_u10um(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_HL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_HL_u10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_HL_u10um(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw + N High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_HL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_HL_u10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_HL_u10um(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values dil Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_LL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil_u10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_LL_u10um(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_LL_u10um(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_LL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_LL_u10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_LL_u10um(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw N Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_LL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_LL_u10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_LL_u10um(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % k_d10um - Apparent growth rates of <10um size fraction from
+            % the difference between >0&<200 and >10&<200 filters
+            % Different from >0&<10 Chl-a conc obatined during en668
+            % k_10um_sf (for size fraction)
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Mean Chl-a T0 dil <10um (d10um)
+            chl_T0_dil_d10um=chl_T0_dil-chl_T0_dil_u10um;
+            if chl_T0_dil_d10um<0
+                chl_T0_dil_d10um=nan;
+            end
+            % Mean Chl-a T0 dil <10um (d10um)
+            chl_T0_wsw_d10um=chl_T0_wsw-chl_T0_wsw_u10um;
+            if chl_T0_wsw_d10um<0
+                chl_T0_wsw_d10um=nan;
+            end
+            % k-values dil High Light (65% or 100% for EN644)
+            % Rewrite it for replicate bottle a, b and c if c
+            c31= b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%'));
+            c32= b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) & T1.iode_quality_flag==1;
+            chl_TF=mean(T1.chl(c32));
+            C3=find(c31==1);
+            if ~isempty(C3)
+                chl_TF_d10um=chl_TF-T1.chl(C3);
+                b3=chl_TF_d10um<0;
+                chl_TF_d10um(b3)=nan;
+                T2.k_dil_HL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_dil_d10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_HL_d10um(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_HL_d10um(T2_start:T2_end)=nan;
+            end
+            clear c31 c32 chl_TF C3 C4 chl_TF_d10um b3
+            % k-values wsw NoN High Light (65% or 100% for EN644)
+            c31= b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%'))&...
+                strcmp(T1.nutrient_treatment,'NoN');
+            c32= b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) & T1.iode_quality_flag==1 &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            chl_TF=mean(T1.chl(c32));
+            C3=find(c31==1);
+            if ~isempty(C3)
+                chl_TF_d10um=chl_TF-T1.chl(C3);
+                b3=chl_TF_d10um<0;
+                chl_TF_d10um(b3)=nan;
+                T2.k_wsw_NoN_HL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_HL_d10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_HL_d10um(T2_start:T2_end)=nan;
+            end
+            clear c31 c32 chl_TF C3 C4 chl_TF_d10um b3
+            % k-values wsw + N High Light (65% or 100% for EN644)
+            c31= b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            c32= b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) & T1.iode_quality_flag==1 &...
+                strcmp(T1.nutrient_treatment,'N');
+            chl_TF=mean(T1.chl(c32));
+            C3=find(c31==1);
+            if ~isempty(C3)
+                chl_TF_d10um=chl_TF-T1.chl(C3);
+                b3=chl_TF_d10um<0;
+                chl_TF_d10um(b3)=nan;
+                T2.k_wsw_N_HL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_HL_d10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_HL_d10um(T2_start:T2_end)=nan;
+            end
+            clear c31 c32 chl_TF C3 C4 chl_TF_d10um b3
+            % k-values dil Low Light (30% or 15% or 5% or 3% or 1%)
+            c31= b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%'));
+            c32= b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) & ...
+                T1.iode_quality_flag==1;
+            chl_TF=mean(T1.chl(c32));
+            C3=find(c31==1);
+            if ~isempty(C3)
+                chl_TF_d10um=chl_TF-T1.chl(C3);
+                b3=chl_TF_d10um<0;
+                chl_TF_d10um(b3)=nan;
+                T2.k_dil_LL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_dil_d10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_LL_d10um(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_LL_d10um(T2_start:T2_end)=nan;
+            end
+            clear c31 c32 chl_TF C3 C4 chl_TF_d10um b3
+            % k-values wsw NoN Low Light (30% or 15% or 5% or 3% or 1%)
+            c31= b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            c32= b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                T1.iode_quality_flag==1 & strcmp(T1.nutrient_treatment,'NoN');
+            chl_TF=mean(T1.chl(c32));
+            C3=find(c31==1);
+            if ~isempty(C3)
+                chl_TF_d10um=chl_TF-T1.chl(C3);
+                b3=chl_TF_d10um<0;
+                chl_TF_d10um(b3)=nan;
+                T2.k_wsw_NoN_LL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_LL_d10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_LL_d10um(T2_start:T2_end)=nan;
+            end
+            clear c31 c32 chl_TF C3 C4 chl_TF_d10um b3
+            % k-values wsw N Low Light (30% or 15% or 5% or 3% or 1%)
+            c31= b2 & strcmp(T1.filter_size,'>10&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            c32= b2 & strcmp(T1.filter_size,'>0&<200') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                T1.iode_quality_flag==1 & strcmp(T1.nutrient_treatment,'N');
+            chl_TF=mean(T1.chl(c32));
+            C3=find(c31==1);
+            if ~isempty(C3)
+                chl_TF_d10um=chl_TF-T1.chl(C3);
+                b3=chl_TF_d10um<0;
+                chl_TF_d10um(b3)=nan;
+                T2.k_wsw_N_LL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_LL_d10um(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_LL_d10um(T2_start:T2_end)=nan;
+            end
+            clear c31 c32 chl_TF C3 C4 chl_TF_d10um b3
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % >0&<10 filters (10um size fractionation EN668)
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Mean Chl-a T0 dil >0&<10
+            % Identify all values obtained with >0&<10 filters at T0 dil
+            % with a iode_quality_flag = 1
+            c1=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'dil') & T1.iode_quality_flag==1;
+            chl_T0_dil_10um_sf=mean(T1.chl(c1));
+            % Mean Chl-a T0 wsw >0&<10
+            c2=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'wsw') & T1.iode_quality_flag==1;
+            chl_T0_wsw_10um_sf=mean(T1.chl(c2));
+            % k-values dil High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_HL_10um_sf(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil_10um_sf);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_HL_10um_sf(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_HL_10um_sf(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_HL_10um_sf(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_10um_sf);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_HL_10um_sf(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_HL_10um_sf(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw + N High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_HL_10um_sf(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_10um_sf);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_HL_10um_sf(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_HL_10um_sf(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values dil Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_LL_10um_sf(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil_10um_sf);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_LL_10um_sf(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_LL_10um_sf(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_LL_10um_sf(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_10um_sf);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_LL_10um_sf(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_LL_10um_sf(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw N Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0&<10') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_LL_10um_sf(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_10um_sf);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_LL_10um_sf(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_LL_10um_sf(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % >0 filters (no 200um screening EN627 L11-B)
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Mean Chl-a T0 dil >0
+            % Identify all values obtained with >0&<10 filters at T0 dil
+            % with a iode_quality_flag = 1
+            c1=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'dil') & T1.iode_quality_flag==1;
+            chl_T0_dil_no_mesh=mean(T1.chl(c1));
+            % Mean Chl-a T0 wsw >0
+            c2=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'T0') ...
+                & strcmp(T1.dilution,'wsw') & T1.iode_quality_flag==1;
+            chl_T0_wsw_no_mesh=mean(T1.chl(c2));
+            % k-values dil High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_HL_no_mesh(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil_no_mesh);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_HL_no_mesh(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_HL_no_mesh(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_HL_no_mesh(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_no_mesh);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_HL_no_mesh(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_HL_no_mesh(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw + N High Light (65% or 100% for EN644)
+            c3=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'65%')|...
+                strcmp(T1.light_level,'100%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_HL_no_mesh(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_no_mesh);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_HL_no_mesh(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_HL_no_mesh(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values dil Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'dil') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%'));
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_dil_LL_no_mesh(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_dil_no_mesh);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_dil_LL_no_mesh(T2_start+C4-1)=nan;
+            else
+                T2.k_dil_LL_no_mesh(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw NoN Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'NoN');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_NoN_LL_no_mesh(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_no_mesh);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_NoN_LL_no_mesh(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_NoN_LL_no_mesh(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+            % k-values wsw N Low Light (30% or 15% or 5% or 3% or 1%)
+            c3=b2 & strcmp(T1.filter_size,'>0') & strcmp(T1.T0_TF,'TF') ...
+                & strcmp(T1.dilution,'wsw') & (strcmp(T1.light_level,'30%')|...
+                strcmp(T1.light_level,'15%')|strcmp(T1.light_level,'5%')|...
+                strcmp(T1.light_level,'3%')|strcmp(T1.light_level,'1%')) &...
+                strcmp(T1.nutrient_treatment,'N');
+            C3=find(c3==1);
+            if ~isempty(C3)
+                T2.k_wsw_N_LL_no_mesh(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_no_mesh);
+                C4=find(T1.iode_quality_flag(C3)==3);
+                T2.k_wsw_N_LL_no_mesh(T2_start+C4-1)=nan;
+            else
+                T2.k_wsw_N_LL_no_mesh(T2_start:T2_end)=nan;
+            end
+            clear c3 C3 C4
+
+        end
+    end
+
+    clear cnt1 Tinc
+
+
+    
+        % Make sure cast and niskin are in text format in the table
+        T2.cast=strcat(T2.cast,"'");
+        T2.niskin=strcat(T2.niskin,"'");
+    
+        % Save the new CRUISE-chla-grazing-experiments-clean.csv files for each
+        % cruise
+        newname=strrep(list(n1).name,'clean','k-values');%Replace raw by clean
+        newtablename=strcat(rep2,newname);%New tablename and path
+        writetable(T2,newtablename)
+
+end
