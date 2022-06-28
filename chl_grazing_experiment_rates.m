@@ -56,64 +56,83 @@ for n1=1:numel(list)
 
     % Table T2 for with the good nb of rows and columns for rates from
     % >0&<200 size fraction (GFF)
-    T2=table('Size',[length(C1) 20],'VariableTypes',...
-        {'string','string','string','double',...
+    T2=table('Size',[length(C1) 28],'VariableTypes',...
+        {'string','string','string','string',...
+        'string','string','string',...
+        'double','double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double'},...
-        'VariableNames',{'cruise','cast','niskin','dilution',...
+        'VariableNames',{'cruise','cast','niskin','niskin_other_method',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'latitude','longitude','depth','duration_incubation','dilution',...
         'mu0_HL','mu0_std_HL','g_HL','g_std_HL','kNoN_HL','kNoN_std_HL','muN_HL','muN_std_HL',...
         'mu0_LL','mu0_std_LL','g_LL','g_std_LL','kNoN_LL','kNoN_std_LL','muN_LL','muN_std_LL'});
 
     % Table T3 for with the good nb of rows and columns for rates from
     % >10&<200 size fraction (10um filters, u10, k_u10um)
-    T3=table('Size',[length(C1) 20],'VariableTypes',...
-        {'string','string','string','double',...
+    T3=table('Size',[length(C1) 28],'VariableTypes',...
+        {'string','string','string','string',...
+        'string','string','string',...
+        'double','double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double'},...
-        'VariableNames',{'cruise','cast','niskin','dilution',...
+        'VariableNames',{'cruise','cast','niskin','niskin_other_method',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'latitude','longitude','depth','duration_incubation','dilution',...
         'mu0_HL','mu0_std_HL','g_HL','g_std_HL','kNoN_HL','kNoN_std_HL','muN_HL','muN_std_HL',...
         'mu0_LL','mu0_std_LL','g_LL','g_std_LL','kNoN_LL','kNoN_std_LL','muN_LL','muN_std_LL'});
 
     % Table T4 for with the good nb of rows and columns for rates from
     % >0&<10 size fraction (GFF - 10um, d10, k_d10um)
-    T4=table('Size',[length(C1) 20],'VariableTypes',...
-        {'string','string','string','double',...
+    T4=table('Size',[length(C1) 28],'VariableTypes',...
+        {'string','string','string','string',...
+        'string','string','string',...
+        'double','double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double'},...
-        'VariableNames',{'cruise','cast','niskin','dilution',...
+        'VariableNames',{'cruise','cast','niskin','niskin_other_method',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'latitude','longitude','depth','duration_incubation','dilution',...
         'mu0_HL','mu0_std_HL','g_HL','g_std_HL','kNoN_HL','kNoN_std_HL','muN_HL','muN_std_HL',...
         'mu0_LL','mu0_std_LL','g_LL','g_std_LL','kNoN_LL','kNoN_std_LL','muN_LL','muN_std_LL'});
 
     % Table T5 for with the good nb of rows and columns for rates from
     % >0&<10 size fraction (10um size fractionation EN668, k_10um_sf)
-    T5=table('Size',[length(C1) 20],'VariableTypes',...
-        {'string','string','string','double',...
+    T5=table('Size',[length(C1) 28],'VariableTypes',...
+        {'string','string','string','string',...
+        'string','string','string',...
+        'double','double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double'},...
-        'VariableNames',{'cruise','cast','niskin','dilution',...
+        'VariableNames',{'cruise','cast','niskin','niskin_other_method',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'latitude','longitude','depth','duration_incubation','dilution',...
         'mu0_HL','mu0_std_HL','g_HL','g_std_HL','kNoN_HL','kNoN_std_HL','muN_HL','muN_std_HL',...
         'mu0_LL','mu0_std_LL','g_LL','g_std_LL','kNoN_LL','kNoN_std_LL','muN_LL','muN_std_LL'});
 
     % Table T6 for with the good nb of rows and columns for rates from
     % >0 size fraction (no 200um screening EN627 L11-B)
-    T6=table('Size',[length(C1) 20],'VariableTypes',...
-        {'string','string','string','double',...
+    T6=table('Size',[length(C1) 28],'VariableTypes',...
+        {'string','string','string','string',...
+        'string','string','string',...
+        'double','double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double',...
         'double','double','double','double'},...
-        'VariableNames',{'cruise','cast','niskin','dilution',...
+        'VariableNames',{'cruise','cast','niskin','niskin_other_method',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'latitude','longitude','depth','duration_incubation','dilution',...
         'mu0_HL','mu0_std_HL','g_HL','g_std_HL','kNoN_HL','kNoN_std_HL','muN_HL','muN_std_HL',...
         'mu0_LL','mu0_std_LL','g_LL','g_std_LL','kNoN_LL','kNoN_std_LL','muN_LL','muN_std_LL'});
-
 
     % Erase the extra " ' " in T1.cast and T1.niskin
     T1.cast=erase(T1.cast,"'");
@@ -136,7 +155,18 @@ for n1=1:numel(list)
 
             b2=b1 & strcmp(T1.niskin,a2(n3));
             B2 = find(b2, 1, 'first');%find the first occurence of b2=1
-            
+
+            %Create a vector with the dilution values
+            if length(T1.dilution(b2))==6%Replicate botles A and B
+                d1=[T1.dilution(b2);ones(12,1)];%When no nutrient limitation
+                d2=[T1.dilution(b2);ones(6,1)];%When nutrient limitation
+            else%Replicate bottles A, B and C
+                d1=[T1.dilution(b2);ones(18,1)];%When no nutrient limitation
+                d2=[T1.dilution(b2);ones(9,1)];%When nutrient limitation
+            end
+
+
+
             %%%%%%%%%%%%%%%%%%%%%%%%%%
             % >0&<200 filters (GFF)
             %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -147,6 +177,11 @@ for n1=1:numel(list)
             T2.cruise(cnt1)=T1.cruise(B2);
             T2.cast(cnt1)=T1.cast(B2);
             T2.niskin(cnt1)=T1.niskin(B2);
+            T2.niskin_other_method(cnt1)=T1.niskin_other_method(B2);
+            T2.date_time_utc_sampling(cnt1)=T1.date_time_utc_sampling(B2);
+            T2.date_time_utc_start(cnt1)=T1.date_time_utc_start(B2);
+            T2.date_time_utc_end(cnt1)=T1.date_time_utc_end(B2);
+            T2.duration_incubation(cnt1)=T1.duration_incubation(B2);
             T2.dilution(cnt1)=T1.dilution(B2);
 
             k_dil=T1.k_dil_HL(b2);
@@ -165,9 +200,10 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
+
+
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         mu=mean(k,'omitnan');
@@ -213,16 +249,15 @@ for n1=1:numel(list)
                     T2.muN_HL(cnt1)=nan;
                     T2.muN_std_HL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -262,7 +297,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -314,9 +349,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
@@ -362,16 +396,15 @@ for n1=1:numel(list)
                     T2.muN_LL(cnt1)=nan;
                     T2.muN_std_LL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -411,7 +444,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -456,6 +489,11 @@ for n1=1:numel(list)
             T3.cruise(cnt1)=T1.cruise(B2);
             T3.cast(cnt1)=T1.cast(B2);
             T3.niskin(cnt1)=T1.niskin(B2);
+            T3.niskin_other_method(cnt1)=T1.niskin_other_method(B2);
+            T3.date_time_utc_sampling(cnt1)=T1.date_time_utc_sampling(B2);
+            T3.date_time_utc_start(cnt1)=T1.date_time_utc_start(B2);
+            T3.date_time_utc_end(cnt1)=T1.date_time_utc_end(B2);
+            T3.duration_incubation(cnt1)=T1.duration_incubation(B2);
             T3.dilution(cnt1)=T1.dilution(B2);
 
             k_dil=T1.k_dil_HL_u10um(b2);
@@ -474,9 +512,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         mu=mean(k,'omitnan');
@@ -522,16 +559,15 @@ for n1=1:numel(list)
                     T3.muN_HL(cnt1)=nan;
                     T3.muN_std_HL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -571,7 +607,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -623,9 +659,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
@@ -671,16 +706,15 @@ for n1=1:numel(list)
                     T3.muN_LL(cnt1)=nan;
                     T3.muN_std_LL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -720,7 +754,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -765,6 +799,11 @@ for n1=1:numel(list)
             T4.cruise(cnt1)=T1.cruise(B2);
             T4.cast(cnt1)=T1.cast(B2);
             T4.niskin(cnt1)=T1.niskin(B2);
+            T4.niskin_other_method(cnt1)=T1.niskin_other_method(B2);
+            T4.date_time_utc_sampling(cnt1)=T1.date_time_utc_sampling(B2);
+            T4.date_time_utc_start(cnt1)=T1.date_time_utc_start(B2);
+            T4.date_time_utc_end(cnt1)=T1.date_time_utc_end(B2);
+            T4.duration_incubation(cnt1)=T1.duration_incubation(B2);
             T4.dilution(cnt1)=T1.dilution(B2);
 
             k_dil=T1.k_dil_HL_d10um(b2);
@@ -783,9 +822,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         mu=mean(k,'omitnan');
@@ -831,16 +869,15 @@ for n1=1:numel(list)
                     T4.muN_HL(cnt1)=nan;
                     T4.muN_std_HL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -880,7 +917,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -932,9 +969,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
@@ -980,16 +1016,15 @@ for n1=1:numel(list)
                     T4.muN_LL(cnt1)=nan;
                     T4.muN_std_LL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -1029,7 +1064,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -1074,6 +1109,11 @@ for n1=1:numel(list)
             T5.cruise(cnt1)=T1.cruise(B2);
             T5.cast(cnt1)=T1.cast(B2);
             T5.niskin(cnt1)=T1.niskin(B2);
+            T5.niskin_other_method(cnt1)=T1.niskin_other_method(B2);
+            T5.date_time_utc_sampling(cnt1)=T1.date_time_utc_sampling(B2);
+            T5.date_time_utc_start(cnt1)=T1.date_time_utc_start(B2);
+            T5.date_time_utc_end(cnt1)=T1.date_time_utc_end(B2);
+            T5.duration_incubation(cnt1)=T1.duration_incubation(B2);
             T5.dilution(cnt1)=T1.dilution(B2);
 
             k_dil=T1.k_dil_HL_10um_sf(b2);
@@ -1092,9 +1132,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         mu=mean(k,'omitnan');
@@ -1140,16 +1179,15 @@ for n1=1:numel(list)
                     T5.muN_HL(cnt1)=nan;
                     T5.muN_std_HL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -1189,7 +1227,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -1241,9 +1279,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
@@ -1289,16 +1326,15 @@ for n1=1:numel(list)
                     T5.muN_LL(cnt1)=nan;
                     T5.muN_std_LL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear k mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -1338,7 +1374,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -1383,6 +1419,11 @@ for n1=1:numel(list)
             T6.cruise(cnt1)=T1.cruise(B2);
             T6.cast(cnt1)=T1.cast(B2);
             T6.niskin(cnt1)=T1.niskin(B2);
+            T6.niskin_other_method(cnt1)=T1.niskin_other_method(B2);
+            T6.date_time_utc_sampling(cnt1)=T1.date_time_utc_sampling(B2);
+            T6.date_time_utc_start(cnt1)=T1.date_time_utc_start(B2);
+            T6.date_time_utc_end(cnt1)=T1.date_time_utc_end(B2);
+            T6.duration_incubation(cnt1)=T1.duration_incubation(B2);
             T6.dilution(cnt1)=T1.dilution(B2);
 
             k_dil=T1.k_dil_HL_no_mesh(b2);
@@ -1401,9 +1442,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         mu=mean(k,'omitnan');
@@ -1449,16 +1489,15 @@ for n1=1:numel(list)
                     T6.muN_HL(cnt1)=nan;
                     T6.muN_std_HL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear d mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -1498,7 +1537,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -1550,9 +1589,8 @@ for n1=1:numel(list)
 
                 if h==0%No nutrient Limitation
 
-                    d=[T1.dilution(b2);ones(12,1)];
                     k=[k_dil;k_wsw_NoN;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d1,k);
 
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
@@ -1598,16 +1636,15 @@ for n1=1:numel(list)
                     T6.muN_LL(cnt1)=nan;
                     T6.muN_std_LL(cnt1)=nan;
 
-                    clear d k mdl mu g mu_stdev g_stdev
+                    clear d mdl mu g mu_stdev g_stdev
 
                 else %Nutirent Limited
 
 
                     %N ammended samples are used to compute muN and g
 
-                    d=[T1.dilution(b2);ones(6,1)];
                     k=[k_dil;k_wsw_N];
-                    mdl=fitlm(d,k);
+                    mdl=fitlm(d2,k);
 
                     if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                         muN=mean(k_wsw_N,'omitnan');
@@ -1647,7 +1684,7 @@ for n1=1:numel(list)
 
                     end
 
-                    clear k d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
+                    clear k mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
                     %Computation of muNoN (in-situ growth rate) from k(1)NoN
                     %and g calculated from N amended samples
@@ -1710,12 +1747,18 @@ for n1=1:numel(list)
     newname4=strrep(list(n1).name,'k-values','rates-d10');%Replace raw by clean
     newtablename4=strcat(rep2,newname4);%New tablename and path
     writetable(T4,newtablename4)
-    newname5=strrep(list(n1).name,'k-values','rates-10um-sf');%Replace raw by clean
-    newtablename5=strcat(rep2,newname5);%New tablename and path
-    writetable(T5,newtablename5)
-    newname6=strrep(list(n1).name,'k-values','rates-no-mesh');%Replace raw by clean
-    newtablename6=strcat(rep2,newname6);%New tablename and path
-    writetable(T6,newtablename6)
+    %only save for cruise with 10um size fractionation (>0&<10)
+    if ~all(isnan(T1.k_dil_HL_10um_sf)) || ~all(isnan(T1.k_dil_LL_10um_sf))
+        newname5=strrep(list(n1).name,'k-values','rates-10um-sf');%Replace raw by clean
+        newtablename5=strcat(rep2,newname5);%New tablename and path
+        writetable(T5,newtablename5)
+    end
+    %only save for cruise with no mesh experiment
+    if ~all(isnan(T1.k_dil_HL_no_mesh)) || ~all(isnan(T1.k_dil_LL_no_mesh))
+        newname6=strrep(list(n1).name,'k-values','rates-no-mesh');%Replace raw by clean
+        newtablename6=strcat(rep2,newname6);%New tablename and path
+        writetable(T6,newtablename6)
+    end
 
 
 end

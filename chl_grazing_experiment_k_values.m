@@ -74,9 +74,13 @@ for n1=1:numel(list)
     % crusie, cast. niskin, and dilution = observed dilution based on GFF
     % samples. Extra columns for the k values for each treatment will be
     % added later
-    T2=table('Size',[length(C1)*nrow 4],'VariableTypes',...
-        {'string','string','string','double'},...
-        'VariableNames',{'cruise','cast','niskin','dilution'});
+    T2=table('Size',[length(C1)*nrow 12],'VariableTypes',...
+        {'string','string','string','string',...
+        'string','string','string',...
+        'double','double','double','double','double'},...
+        'VariableNames',{'cruise','cast','niskin','niskin_other_method',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'latitude','longitude','depth','duration_incubation','dilution'});
 
 
     % Erase the extra " ' " in T1.cast and T1.niskin
@@ -103,12 +107,17 @@ for n1=1:numel(list)
             B2 = find(b2, 1, 'first');%find the first occurence of b2=1
             T2_start=(cnt1*nrow-(nrow-1));%Define where to store the first value for this given cast/depth
             T2_end=(cnt1*nrow);%Define where to store the last value for this given cast/depth
-            Tinc=datenum(T1.date_time_utc_end(B2))-datenum(T1.date_time_utc_start(B2));
-            % Correpsonding cruise/cast/niskin
+
+            Tinc=datenum(T1.date_time_utc_end(B2),'yyyy-mm-dd hh:MM:ss')-datenum(T1.date_time_utc_start(B2),'yyyy-mm-dd hh:MM:ss');
+            % Correpsonding cruise/cast/niskin/date_time...
             T2.cruise(T2_start:T2_end)=T1.cruise(B2);
             T2.cast(T2_start:T2_end)=T1.cast(B2);
             T2.niskin(T2_start:T2_end)=T1.niskin(B2);
-
+            T2.niskin_other_method(T2_start:T2_end)=T1.niskin_other_method(B2);
+            T2.date_time_utc_sampling(T2_start:T2_end)=T1.date_time_utc_sampling(B2);
+            T2.date_time_utc_start(T2_start:T2_end)=T1.date_time_utc_start(B2);
+            T2.date_time_utc_end(T2_start:T2_end)=T1.date_time_utc_end(B2);
+            T2.duration_incubation(T2_start:T2_end)=Tinc;
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%
             % >0&<200 filters (GFF)
@@ -145,9 +154,16 @@ for n1=1:numel(list)
                 strcmp(T1.nutrient_treatment,'NoN');
             C3=find(c3==1);
             if ~isempty(C3)
-                T2.k_wsw_NoN_HL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
-                C4=find(T1.iode_quality_flag(C3)==3);
-                T2.k_wsw_NoN_HL(T2_start+C4-1)=nan;
+                if length(a0)==2%When only 2 replicate bottles
+                    T2.k_wsw_NoN_HL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_HL(T2_start+C4-1)=nan;
+                elseif length(a0)==3%When only 3 replicate bottles
+                    T2.k_wsw_NoN_HL(T2_start:T2_end-3)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_HL(T2_start+C4-1)=nan;
+                    T2.k_wsw_NoN_HL(T2_start+6:T2_end)=nan;
+                end
             else
                 T2.k_wsw_NoN_HL(T2_start:T2_end)=nan;
             end
@@ -188,9 +204,16 @@ for n1=1:numel(list)
                 strcmp(T1.nutrient_treatment,'NoN');
             C3=find(c3==1);
             if ~isempty(C3)
-                T2.k_wsw_NoN_LL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
-                C4=find(T1.iode_quality_flag(C3)==3);
-                T2.k_wsw_NoN_LL(T2_start+C4-1)=nan;
+                if length(a0)==2%When only 2 replicate bottles
+                    T2.k_wsw_NoN_LL(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_LL(T2_start+C4-1)=nan;
+                elseif length(a0)==3%When only 3 replicate bottles
+                    T2.k_wsw_NoN_LL(T2_start:T2_end-3)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_LL(T2_start+C4-1)=nan;
+                    T2.k_wsw_NoN_LL(T2_start+6:T2_end)=nan;
+                end
             else
                 T2.k_wsw_NoN_LL(T2_start:T2_end)=nan;
             end
@@ -244,9 +267,16 @@ for n1=1:numel(list)
                 strcmp(T1.nutrient_treatment,'NoN');
             C3=find(c3==1);
             if ~isempty(C3)
-                T2.k_wsw_NoN_HL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
-                C4=find(T1.iode_quality_flag(C3)==3);
-                T2.k_wsw_NoN_HL_u10um(T2_start+C4-1)=nan;
+                if length(a0)==2%When only 2 replicate bottles
+                    T2.k_wsw_NoN_HL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_HL_u10um(T2_start+C4-1)=nan;
+                elseif length(a0)==3%When only 3 replicate bottles
+                    T2.k_wsw_NoN_HL_u10um(T2_start:T2_end-3)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_HL_u10um(T2_start+C4-1)=nan;
+                    T2.k_wsw_NoN_HL_u10um(T2_start+6:T2_end)=nan;
+                end
             else
                 T2.k_wsw_NoN_HL_u10um(T2_start:T2_end)=nan;
             end
@@ -287,9 +317,16 @@ for n1=1:numel(list)
                 strcmp(T1.nutrient_treatment,'NoN');
             C3=find(c3==1);
             if ~isempty(C3)
-                T2.k_wsw_NoN_LL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
-                C4=find(T1.iode_quality_flag(C3)==3);
-                T2.k_wsw_NoN_LL_u10um(T2_start+C4-1)=nan;
+                if length(a0)==2%When only 2 replicate bottles
+                    T2.k_wsw_NoN_LL_u10um(T2_start:T2_end)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_LL_u10um(T2_start+C4-1)=nan;
+                elseif length(a0)==3%When only 3 replicate bottles
+                    T2.k_wsw_NoN_LL_u10um(T2_start:T2_end-3)=1/Tinc*log(T1.chl(C3)./chl_T0_wsw_u10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_LL_u10um(T2_start+C4-1)=nan;
+                    T2.k_wsw_NoN_LL_u10um(T2_start+6:T2_end)=nan;
+                end
             else
                 T2.k_wsw_NoN_LL_u10um(T2_start:T2_end)=nan;
             end
@@ -362,9 +399,16 @@ for n1=1:numel(list)
                 chl_TF_d10um=chl_TF-T1.chl(C3);
                 b3=chl_TF_d10um<0;
                 chl_TF_d10um(b3)=nan;
-                T2.k_wsw_NoN_HL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
-                C4=find(T1.iode_quality_flag(C3)==3);
-                T2.k_wsw_NoN_HL_d10um(T2_start+C4-1)=nan;
+                if length(a0)==2%When only 2 replicate bottles
+                    T2.k_wsw_NoN_HL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_HL_d10um(T2_start+C4-1)=nan;
+                elseif length(a0)==3%When only 3 replicate bottles
+                    T2.k_wsw_NoN_HL_d10um(T2_start:T2_end-3)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_HL_d10um(T2_start+C4-1)=nan;
+                    T2.k_wsw_NoN_HL_d10um(T2_start+6:T2_end)=nan;
+                end
             else
                 T2.k_wsw_NoN_HL_d10um(T2_start:T2_end)=nan;
             end
@@ -431,9 +475,16 @@ for n1=1:numel(list)
                 chl_TF_d10um=chl_TF-T1.chl(C3);
                 b3=chl_TF_d10um<0;
                 chl_TF_d10um(b3)=nan;
-                T2.k_wsw_NoN_LL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
-                C4=find(T1.iode_quality_flag(C3)==3);
-                T2.k_wsw_NoN_LL_d10um(T2_start+C4-1)=nan;
+                if length(a0)==2%When only 2 replicate bottles
+                    T2.k_wsw_NoN_LL_d10um(T2_start:T2_end)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_LL_d10um(T2_start+C4-1)=nan;
+                elseif length(a0)==3%When only 3 replicate bottles
+                    T2.k_wsw_NoN_LL_d10um(T2_start:T2_end-3)=1/Tinc*log(chl_TF_d10um./chl_T0_wsw_d10um);
+                    C4=find(T1.iode_quality_flag(C3)==3);
+                    T2.k_wsw_NoN_LL_d10um(T2_start+C4-1)=nan;
+                    T2.k_wsw_NoN_LL_d10um(T2_start+6:T2_end)=nan;
+                end
             else
                 T2.k_wsw_NoN_LL_d10um(T2_start:T2_end)=nan;
             end
