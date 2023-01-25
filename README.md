@@ -7,8 +7,8 @@ Create a new table for each cruise gathering all the caluclated k-values (appare
 The duration of each incuabtion is calculated from the date_time_utc_end and the date_time_utc_start for each experiment.\
 All the triplicate T0 Chl-a conc are calculated (only the one with iode_quality_flag = 1).\
 T0 WSW mean Chla (Total = Chla, >10um = Chlau10, <10um = Chlad10) are reported in the new table, in addition to the % of Chl-a </>10um (Chlad10per and Chlau10per). Chlad10 = Chla - Chlau10. If Chlad10 < 0, Chlad10 = 0, Chlad10per = 0% and Chlau10per = 100%. \
-k are caluclated from each TF values. Up to 6 k values are then obatined for each treatment (dilution/nutrient/light) and filter type (>0&<200, >10&<200, >0 and >0&<10 ).\
-Based on >0&200 (GFF) and >10&<200 (10um filters, u10 = up 10), >0&<10 (d10 = down 10) Chl-a values are calculated and then corresponding k values. For each triplicate, Chl-a d10 triplcate values are calculated as the diffrenece between the mean Chl-a value on >0&<200 and individual triplicate Chl-a values of >10&<200.\ Only dat with QC = 1 are considered. If Chl-a d10 <0, then Chl-a conc and k = NaN.\
+k are caluclated from each TF values. Up to 6 k (9 k values from ar66b, new experimental design) values are then obatined for each treatment (dilution/nutrient/light) and filter type (>0&<200, >10&<200, >0 and >0&<10 ).\
+Based on >0&200 (GFF) and >10&<200 (10um filters), >0&<10 (from difference between Chl-a conc. in >0&<200 and >10&<200 size fractions) Chl-a values are calculated and then corresponding k values. For each triplicate, Chl-a d10 triplcate values are calculated as the diffrenece between the mean Chl-a value on >0&<200 and individual triplicate Chl-a values of >10&<200.\ Only dat with QC = 1 are considered. If Chl-a d10 <0, then Chl-a conc and k = NaN.\
 *Input: CRUSIE-chl-grazing-experiments-clean.csv files*\
 *Outputs: CRUISE-chla-grazing-experiments-k-values.csv files.*\
 
