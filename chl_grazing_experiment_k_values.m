@@ -191,7 +191,7 @@ for n1=1:numel(list)
                     %compute the % of Chl-a in each size fraction
                     if CHLAd10<0
                         T2.Chlad10(T2_start:T2_end)=0;
-                        T2.Chlau10per(T2_start:T2_end)=100;
+                        T2.Chlau10per(T2_start:T2_end)=1;
                         T2.Chlad10per(T2_start:T2_end)=0;
                     else
                         T2.Chlad10(T2_start:T2_end)=CHLAd10;
@@ -201,6 +201,7 @@ for n1=1:numel(list)
                     %if Chla '>10&<200' > Chla '>0&<200'
                     if CHLAu10>CHLA
                         CHLAu10=CHLA;
+                        T2.Chlau10(T2_start:T2_end)=CHLAu10;
                     end
 
                     %Get the dilution level from >0&<200 filters at T0
@@ -331,7 +332,7 @@ for n1=1:numel(list)
                     %compute the % of Chl-a in each size fraction
                     if CHLAd10<0
                         T2.Chlad10(T2_start:T2_end)=0;
-                        T2.Chlau10per(T2_start:T2_end)=100;
+                        T2.Chlau10per(T2_start:T2_end)=1;
                         T2.Chlad10per(T2_start:T2_end)=0;
                     else
                         T2.Chlad10(T2_start:T2_end)=CHLAd10;
@@ -341,6 +342,7 @@ for n1=1:numel(list)
                     %if Chla '>10&<200' > Chla '>0&<200'
                     if CHLAu10>CHLA
                         CHLAu10=CHLA;
+                        T2.Chlau10(T2_start:T2_end)=CHLAu10;
                     end
 
                     %Get the dilution level from >0&<200 filters at T0
