@@ -33,3 +33,9 @@ A significant positive slope (i.e. higher growth in the WSW treatment than in th
 In such cases, g was reported as undetermined, and k in the undiluted bottles represented mu_N and mu_0. Uncertainties relative to mu_N and mu_0 were estimated from the standard deviations observed on k_N and k_NoN triplicate values.\
 *Input: CRUSIE-chl-grazing-experiments-k-values.csv files*\
 *Outputs: CRUISE-chla-grazing-experiments-rates.csv files.*\
+
+The **chl_grazing_experiment_concatenate_order_rates.m** Matlab script is used to concatenation of the CRUISE rate table to get one final table with all the cruises together, and reorganization of the table by cruise and by inverse latitude (station nb).
+1) concatenation of the 11 tables with rates
+2) rearragement of the table by cruise, from the oldest (EN608) to the most recent (EN687), by inverse latitude (station nb) and by size fraction (>0&<200, >10&<200, >0&<10 (from difference between >0&<200 and >10&<200 Chl-a conc), >0 (no mesh, en627) and >0&<10sf (size fractionated dilution experiments during en668)
+*Input: CRUSIE-chl-grazing-experiments-rates.csv files*\
+*Outputs: NES-LTER-chla-grazing-experiments-rates.csv file*\
