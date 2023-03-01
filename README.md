@@ -39,3 +39,15 @@ Concatenation of the 11 tables with rates.\
 Rearragement of the table by cruise, from the oldest (EN608) to the most recent (EN687), by inverse latitude (station nb) and by size fraction (>0&<200, >10&<200, >0&<10 (from difference between >0&<200 and >10&<200 Chl-a conc), >0 (no mesh, en627) and >0&<10sf (size fractionated dilution experiments during en668).\
 *Input: CRUSIE-chl-grazing-experiments-rates.csv files*\
 *Outputs: NES-LTER-chla-grazing-experiments-rates.csv file*\
+
+The **chl_grazing_experiment_rates_QC.m** Matlab file is used to Quality Check (QC) and rename of some values of the rate data based on the following criteria:\
+1) Change grazing rates < 0 (and g_std) to n/d\
+2) Change muN = NaN (and mu_N_std) to n/n\
+3) Change mu0 = NaN (and mu_N_std) to n/d. Most of the occurence are from en608,en617 and en627  </> 10 um size fractions. </> 10 um size fractions only from nutrient amended samples, so only mu_N and g, no mu_0. Note that when no nutrient limitation for >0&<200 size fraction, mu_0 can be considered equal to mu_N. For these cruise and these size fraction mu_0 = n/d. Few other occurence (5) for other cruises for the >0&<10 size fraction, because no Chl-a data with QC = 1 for these samples\
+4) if temp_diff (temperature difference between sampling temperature and temperature in incubator <-4oC or > 4oC, iode_quality_flag (QC flag) = 3 (questionable)\
+5) For light level = 100% (en644), iode_quality_flag (QC flag) = 3 (questionable). It was too much light intensity for the experiment and the phytoplankton got "burned/fried"\
+6) if dilution (dilution level for the dilution experiment) > 0.4 (40%), iode_quality_flag (QC flag) = 3 (questionable). The optimal dilution level for the 2-points method is <40% (Morison and Menden-Deuer, 2017)\
+7) if Chlad10 (<10um) or Chlau10 (>10um) concentrations are < 0.02 mg m-3, the rates for these size fractions are considered questionable (iode_quality_flag (QC flag) = 3)\
+8) if Chlad10per (<10um) or Chlau10per (>10um) relative contribution to total Chl-a are < 0.02 (2%), the rates for these size fractions are considered questionable (iode_quality_flag (QC flag) = 3)\
+*Input: NES-LTER-chla-grazing-experiments-rates.csv file*\
+*Outputs: NES-LTER-chla-grazing-experiments-rates-qc.csv file*
