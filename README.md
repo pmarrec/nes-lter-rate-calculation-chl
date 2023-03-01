@@ -12,7 +12,7 @@ Based on >0&200 (GFF) and >10&<200 (10um filters), >0&<10 (from difference betwe
 *Input: CRUSIE-chl-grazing-experiments-clean.csv files*\
 *Outputs: CRUISE-chla-grazing-experiments-k-values.csv files.*\
 
-The **chl-grazing_experiment_rates.m** Matlab script is used to compute phytoplnkton growth rates (mu0), microzooplankton grazing rates (g), apparent growth rates in nonamended nutrient treatment (wsw NoN, kNoN) and phytoplankton growth rates in nutrient amended treatments (muN = g + kN). Associted errors (std) were estimated for all these rates. Note that kNoN and muN were estimated only when there was apparent nutrient limitation.\
+The **chl-grazing_experiment_rates.m** Matlab script is used to compute phytoplankton growth rates (mu0), microzooplankton grazing rates (g), apparent growth rates in nonamended nutrient treatment (wsw NoN, kNoN) and phytoplankton growth rates in nutrient amended treatments (muN = g + kN). Associted errors (std) were estimated for all these rates. Note that kNoN and muN were estimated only when there was apparent nutrient limitation.\
 Create a new table for each cruise gathering all the caluclated rates for each tretment and flter type from the k (apparent growth rates) values and the associated data and metadata.\
 Phytoplankton growth rates and protist grazing rates were estimated from 24 h changes in Chl-a concentration. For each incubation bottle, the apparent growth rates (k, d^-1) were calculated as:\ 
 k=1⁄t×ln(C_t⁄C_0) \
