@@ -49,5 +49,6 @@ The **chl_grazing_experiment_rates_QC.m** Matlab file is used to Quality Check (
 6) if dilution (dilution level for the dilution experiment) > 0.4 (40%), iode_quality_flag (QC flag) = 3 (questionable). The optimal dilution level for the 2-points method is <40% (Morison and Menden-Deuer, 2017)
 7) if Chlad10 (<10um) or Chlau10 (>10um) concentrations are < 0.02 mg m-3, the rates for these size fractions are considered questionable (iode_quality_flag (QC flag) = 3)
 8) if Chlad10per (<10um) or Chlau10per (>10um) relative contribution to total Chl-a are < 0.02 (2%), the rates for these size fractions are considered questionable (iode_quality_flag (QC flag) = 3)\
+
 *Input: NES-LTER-chla-grazing-experiments-rates.csv file*\
 *Outputs: NES-LTER-chla-grazing-experiments-rates-qc.csv file*
