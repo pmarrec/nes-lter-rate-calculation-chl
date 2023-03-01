@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Matlab script for concatenation of the CRUISE rate table to get one final
 % table with all the cruises together, and reorganization of the table by
-% cruise and by inverse latitude (station nb)
+% cruise and by inverse latitude (station nb).
 %
 % 1) concatenation of the 11 tables with rates
 % 2) rearragement of the table by cruise, from the oldest (EN608) to the most
@@ -12,13 +12,13 @@
 %
 % Input: CRUSIE-chl-grazing-experiments-rates.csv files
 %
-% Outputs: NES-LTER-chla-grazing-experiments-rates.csv files.
+% Outputs: NES-LTER-chla-grazing-experiments-rates.csv file.
 %
 % Written by Pierre Marrec
 %
 % pmarrec@uri.edu
 %
-% 1/25/2023
+% 2/28/2023
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars, clc, close all
