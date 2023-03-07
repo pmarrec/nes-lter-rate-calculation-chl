@@ -33,13 +33,13 @@
 %
 % pmarrec@uri.edu
 %
-% 1/25/2023
+% 3/7/2023
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars, clc, close all
 
 % Set the directory where we work
-rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\NES-LTER_Chla_Cleaning_Rates_Computation\';
+rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\';
 % Set the directory where the input raw data are
 rep1 = strcat(rep,'chl-grazing-experiment-clean\');
 % Set the directory where the output clean data are
@@ -87,16 +87,16 @@ for n1=1:numel(list)
     % Nb of rows = number of of different station/depth/filter size/light
     % treatment + F0 nb of >0&<10  multiply by nrows (6 or 9 depending on
     % cruises)
-    T2=table('Size',[(length(C1)+F0)*nrow 31],'VariableTypes',...
-        {'string','string','string','string','string',...
-        'string','double','string','string','string',...
+    T2=table('Size',[(length(C1)+F0)*nrow 29],'VariableTypes',...
+        {'string','string','string','string',...
+        'string','string','string','string',...
         'double','double','double','double',...
         'double','double','double','string',...
         'string','string','string',...
         'double','double','double','double','double',...
         'double','double','double','double','double'},...
-        'VariableNames',{'cruise','cast','niskin','niskin_other_method','station',...
-        'nearest_station','distance','date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'VariableNames',{'cruise','cast','niskin','niskin_second_cast','station',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
         'latitude','longitude','depth','temperature_sampling','incubation_tank',...
         'temperature_incubation_avg','temperature_incubation_std', ...
         'light_level','size_fraction','replicate_bottle','replicate_chl',...
@@ -159,10 +159,8 @@ for n1=1:numel(list)
                     T2.cruise(T2_start:T2_end)=T1.cruise(B4);
                     T2.cast(T2_start:T2_end)=T1.cast(B4);
                     T2.niskin(T2_start:T2_end)=T1.niskin(B4);
-                    T2.niskin_other_method(T2_start:T2_end)=T1.niskin_other_method(B4);
+                    T2.niskin_second_cast(T2_start:T2_end)=T1.niskin_second_cast(B4);
                     T2.station(T2_start:T2_end)=T1.station(B4);
-                    T2.nearest_station(T2_start:T2_end)=T1.nearest_station(B4);
-                    T2.distance(T2_start:T2_end)=T1.distance(B4);
                     T2.date_time_utc_sampling(T2_start:T2_end)=T1.date_time_utc_sampling(B4);
                     T2.date_time_utc_start(T2_start:T2_end)=T1.date_time_utc_start(B4);
                     T2.date_time_utc_end(T2_start:T2_end)=T1.date_time_utc_end(B4);
@@ -300,10 +298,8 @@ for n1=1:numel(list)
                     T2.cruise(T2_start:T2_end)=T1.cruise(B41);
                     T2.cast(T2_start:T2_end)=T1.cast(B41);
                     T2.niskin(T2_start:T2_end)=T1.niskin(B41);
-                    T2.niskin_other_method(T2_start:T2_end)=T1.niskin_other_method(B41);
+                    T2.niskin_second_cast(T2_start:T2_end)=T1.niskin_second_cast(B41);
                     T2.station(T2_start:T2_end)=T1.station(B41);
-                    T2.nearest_station(T2_start:T2_end)=T1.nearest_station(B41);
-                    T2.distance(T2_start:T2_end)=T1.distance(B41);
                     T2.date_time_utc_sampling(T2_start:T2_end)=T1.date_time_utc_sampling(B41);
                     T2.date_time_utc_start(T2_start:T2_end)=T1.date_time_utc_start(B41);
                     T2.date_time_utc_end(T2_start:T2_end)=T1.date_time_utc_end(B41);

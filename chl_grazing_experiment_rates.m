@@ -50,19 +50,19 @@
 %
 % pmarrec@uri.edu
 %
-% 1/25/2023
+% 3/7/2023
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars, clc, close all
 
 % Set the directory where we work
-rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\NES-LTER_Chla_Cleaning_Rates_Computation\';
+rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\';
 % Set the directory where the input raw data are
 rep1 = strcat(rep,'chl-grazing-experiment-k-values\');
 % Set the directory where the output clean data are
 rep2 = strcat(rep,'chl-grazing-experiment-rates\');
 
-% Find all the *.cnv files
+% Find all the *.csv files
 ext='*.csv';
 chemin = fullfile(rep1,ext);
 list = dir(chemin);% List all files of interest in the directory
@@ -84,22 +84,22 @@ for n1=1:numel(list)
     [c1,C1,C2]=findgroups(T1.cast,T1.niskin);
 
     % Table T2 for with the good nb of rows and columns for rates
-    T2=table('Size',[length(C1) 32],'VariableTypes',...
+    T2=table('Size',[length(C1) 30],'VariableTypes',...
         {'string','string','string','string','string',...
-        'string','double','string','string','string',...
+        'string','string','string',...
         'double','double','double','double','double',...
         'double','double',...
         'string','string',...
         'double','double','double','double','double',...
         'double','double',...
         'double','double','double','double','double','double'},...
-        'VariableNames',{'cruise','cast','niskin','niskin_other_method','station',...
-        'nearest_station','distance','date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
+        'VariableNames',{'cruise','cast','niskin','niskin_second_cast','station',...
+        'date_time_utc_sampling','date_time_utc_start','date_time_utc_end',...
         'latitude','longitude','depth','temperature_sampling','incubation_tank',...
         'temperature_incubation_avg','temperature_incubation_std',...
         'light_level','size_fraction','Chla','Chlad10','Chlau10','Chlad10per','Chlau10per',...
         'duration_incubation','dilution',...
-        'mu0','mu0_std','g','g_std','muN','muN_std'});
+        'mu_0','mu_0_std','grazing','grazing_std','mu_N','mu_N_std'});
 
 
     % Erase the extra " ' " in T1.cast and T1.niskin
@@ -140,10 +140,8 @@ for n1=1:numel(list)
                     T2.cruise(cnt1)=T1.cruise(B4);
                     T2.cast(cnt1)=T1.cast(B4);
                     T2.niskin(cnt1)=T1.niskin(B4);
-                    T2.niskin_other_method(cnt1)=T1.niskin_other_method(B4);
+                    T2.niskin_second_cast(cnt1)=T1.niskin_second_cast(B4);
                     T2.station(cnt1)=T1.station(B4);
-                    T2.nearest_station(cnt1)=T1.nearest_station(B4);
-                    T2.distance(cnt1)=T1.distance(B4);
                     T2.date_time_utc_sampling(cnt1)=T1.date_time_utc_sampling(B4);
                     T2.date_time_utc_start(cnt1)=T1.date_time_utc_start(B4);
                     T2.date_time_utc_end(cnt1)=T1.date_time_utc_end(B4);
@@ -195,45 +193,45 @@ for n1=1:numel(list)
 
                             if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                                 mu=mean(k,'omitnan');
-                                T2.mu0(cnt1)=mu;
+                                T2.mu_0(cnt1)=mu;
                                 mu_stdev=std(k,'omitnan');
-                                T2.mu0_std(cnt1)=mu_stdev;
+                                T2.mu_0_std(cnt1)=mu_stdev;
                                 g=0;
-                                T2.g(cnt1)=g;
+                                T2.grazing(cnt1)=g;
                                 g_stdev=0;
-                                T2.g_std(cnt1)=g_stdev;
+                                T2.grazing_std(cnt1)=g_stdev;
 
                             elseif mdl.Coefficients{2,1}>0%if g<0 (slope>0)
 
                                 mu=mean(k(7:18),'omitnan');%Mean value of k(1)
-                                T2.mu0(cnt1)=mu;
+                                T2.mu_0(cnt1)=mu;
                                 mu_stdev=std(k(7:18),'omitnan');%StdDev value of k(1)
-                                T2.mu0_std(cnt1)=mu_stdev;
+                                T2.mu_0_std(cnt1)=mu_stdev;
                                 g=(mean(k(1:6),'omitnan')-mean(k(7:18),'omitnan'))/(1-T1.dilution(B4));
                                 %g=-mdl.Coefficients{2,1};%We keep the negative g value in case
-                                T2.g(cnt1)=g;
+                                T2.grazing(cnt1)=g;
                                 g_stdev=mdl.Coefficients{2,2};%Same for g StdDev
-                                T2.g_std(cnt1)=g_stdev;
+                                T2.grazing_std(cnt1)=g_stdev;
 
                             else %if g>0 (slope<0)
 
                                 g=(mean(k(1:6),'omitnan')-mean(k(7:18),'omitnan'))/(1-T1.dilution(B4));
                                 %g=-mdl.Coefficients{2,1};
-                                T2.g(cnt1)=g;% g = -slope = [k(d)-k(1)]/(1-d)
+                                T2.grazing(cnt1)=g;% g = -slope = [k(d)-k(1)]/(1-d)
                                 mu=mean(k(7:18),'omitnan')+g;
                                 %mu=mdl.Coefficients{1,1};
-                                T2.mu0(cnt1)=mu;% mu = y-intercept = g + average k(1)
+                                T2.mu_0(cnt1)=mu;% mu = y-intercept = g + average k(1)
                                 mu_stdev=std(k(7:18),'omitnan');
                                 %mu_stdev=mdl.Coefficients{1,2};
-                                T2.mu0_std(cnt1)=mu_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
+                                T2.mu_0_std(cnt1)=mu_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
                                 g_stdev=mdl.Coefficients{2,2};
-                                T2.g_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
+                                T2.grazing_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
 
                             end
 
 
-                            T2.muN(cnt1)=nan;
-                            T2.muN_std(cnt1)=nan;
+                            T2.mu_N(cnt1)=nan;
+                            T2.mu_N_std(cnt1)=nan;
 
                             clear k mdl mu g mu_stdev g_stdev
 
@@ -247,39 +245,39 @@ for n1=1:numel(list)
 
                             if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
                                 muN=mean(k_wsw_N,'omitnan');
-                                T2.muN(cnt1)=muN;
+                                T2.mu_N(cnt1)=muN;
                                 muN_stdev=std(k_wsw_N,'omitnan');
-                                T2.muN_std(cnt1)=muN_stdev;
+                                T2.mu_N_std(cnt1)=muN_stdev;
                                 g=0;
-                                T2.g(cnt1)=g;
+                                T2.grazing(cnt1)=g;
                                 g_stdev=0;
-                                T2.g_std(cnt1)=g_stdev;
+                                T2.grazing_std(cnt1)=g_stdev;
 
                             elseif mdl.Coefficients{2,1}>0%if g<0 (slope>0)
 
                                 muN=mean(k_wsw_N,'omitnan');%Mean value of k(1)
-                                T2.muN(cnt1)=muN;
+                                T2.mu_N(cnt1)=muN;
                                 muN_stdev=std(k_wsw_N,'omitnan');%StdDev value of k(1)
-                                T2.muN_std(cnt1)=muN_stdev;
+                                T2.mu_N_std(cnt1)=muN_stdev;
                                 g=(mean(k_dil,'omitnan')-mean(k_wsw_N,'omitnan'))/(1-T1.dilution(B4));
                                 %g=-mdl.Coefficients{2,1};%We keep the negative g value in case
-                                T2.g(cnt1)=g;
+                                T2.grazing(cnt1)=g;
                                 g_stdev=mdl.Coefficients{2,2};%Same for g StdDev
-                                T2.g_std(cnt1)=g_stdev;
+                                T2.grazing_std(cnt1)=g_stdev;
 
                             else %if g>0 (slope<0)
 
                                 g=(mean(k_dil,'omitnan')-mean(k_wsw_N,'omitnan'))/(1-T1.dilution(B4));
                                 %g=-mdl.Coefficients{2,1};
-                                T2.g(cnt1)=g;% g = -slope = [k(d)-k(1)]/(1-d)
+                                T2.grazing(cnt1)=g;% g = -slope = [k(d)-k(1)]/(1-d)
                                 mu=mean(k_wsw_N,'omitnan')+g;
                                 %mu=mdl.Coefficients{1,1};
-                                T2.muN(cnt1)=mu;% mu = y-intercept = g + average k(1)
+                                T2.mu_N(cnt1)=mu;% mu = y-intercept = g + average k(1)
                                 mu_stdev=std(k_wsw_N,'omitnan');
                                 %mu_stdev=mdl.Coefficients{1,2};
-                                T2.muN_std(cnt1)=mu_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
+                                T2.mu_N_std(cnt1)=mu_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
                                 g_stdev=mdl.Coefficients{2,2};
-                                T2.g_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
+                                T2.grazing_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
 
                             end
 
@@ -297,18 +295,18 @@ for n1=1:numel(list)
                                 muNoN=kNoN+g;
                             end
 
-                            T2.mu0(cnt1)=muNoN;
-                            T2.mu0_std(cnt1)=kNoN_stdev;%Find a better way to estimate StdDev on muNoN
+                            T2.mu_0(cnt1)=muNoN;
+                            T2.mu_0_std(cnt1)=kNoN_stdev;%Find a better way to estimate StdDev on muNoN
                         end
                         clear h p k_dil k_dil_nan k_wsw_NoN k_wsw_NoN_nan k_wsw_N k_wsw_N_nan g kNoN kNoN_stdev muNoN muNoN_stdev
 
                     else%Nan Values if only NaN values for k
-                        T2.mu0(cnt1)=nan;
-                        T2.mu0_std(cnt1)=nan;
-                        T2.g(cnt1)=nan;
-                        T2.g_std(cnt1)=nan;
-                        T2.muN(cnt1)=nan;
-                        T2.muN_std(cnt1)=nan;
+                        T2.mu_0(cnt1)=nan;
+                        T2.mu_0_std(cnt1)=nan;
+                        T2.grazing(cnt1)=nan;
+                        T2.grazing_std(cnt1)=nan;
+                        T2.mu_N(cnt1)=nan;
+                        T2.mu_N_std(cnt1)=nan;
 
                     end
 

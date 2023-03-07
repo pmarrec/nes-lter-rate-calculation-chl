@@ -2,7 +2,8 @@
 % Matlab script for the Quality Check (QC) and renaming  of some values 
 % of the rate data based on the following criteria:
 %
-% 1) Change grazing rates < 0 (and g_std) to n/d
+% 1) Change grazing rates < 0 (and g_std) to n/d and change grazing rates =
+% NaN to n/d (and g_std)
 %
 % 2) Change muN = NaN (and mu_N_std) to n/n
 %
@@ -44,13 +45,13 @@
 %
 % pmarrec@uri.edu
 %
-% 2/28/2023
+% 3/7/2023
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars, clc, close all
 
 % Set the directory where we work
-rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\NES-LTER_Chla_Cleaning_Rates_Computation\';
+rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\';
 
 % Find all the *.csv files
 tablename=strcat(rep,'NES-LTER-chla-grazing-experiments-rates.csv');
@@ -60,22 +61,25 @@ T1=readtable(tablename);
 T1.iode_quality_flag=ones(height(T1),1);
 
 
-% 1) Change grazing rates < 0 (and g_std) to n/d
-a1=find(T1.g<0);
-T1.g=num2cell(T1.g);
-T1.g_std=num2cell(T1.g_std);
+% 1) Change grazing rates < 0 (and g_std) to n/d and grazing rates = NaN to
+% n/d (and g_std)
+a1=find(T1.grazing<0|isnan(T1.grazing));
+T1.grazing=num2cell(T1.grazing);
+T1.grazing_std=num2cell(T1.grazing_std);
 for n1=1:length(a1)
-T1.g{a1(n1)}={'n/d'};
-T1.g_std{a1(n1)}={'n/d'};
+T1.grazing{a1(n1)}={'n/d'};
+T1.grazing_std{a1(n1)}={'n/d'};
 end
 
+
+
 % 2) Change mu_N = NaN (an mu_N_std) to n/n
-a2=find(isnan(T1.muN));
-T1.muN=num2cell(T1.muN);
-T1.muN_std=num2cell(T1.muN_std);
+a2=find(isnan(T1.mu_N));
+T1.mu_N=num2cell(T1.mu_N);
+T1.mu_N_std=num2cell(T1.mu_N_std);
 for n2=1:length(a2)
-T1.muN{a2(n2)}={'n/n'};
-T1.muN_std{a2(n2)}={'n/n'};
+T1.mu_N{a2(n2)}={'n/n'};
+T1.mu_N_std{a2(n2)}={'n/n'};
 end
 
 % 3) Change mu0 = NaN (and mu_N_std) to n/d. Most of the occurence are from 
@@ -86,12 +90,12 @@ end
 % mu_N. For these cruise and these size fraction mu_0 = n/d.
 % Few other occurence (5) for other cruises for the >0&<10 size fraction, 
 % because no Chl-a data with QC = 1 for these samples
-a3=find(isnan(T1.mu0));
-T1.mu0=num2cell(T1.mu0);
-T1.mu0_std=num2cell(T1.mu0_std);
+a3=find(isnan(T1.mu_0));
+T1.mu_0=num2cell(T1.mu_0);
+T1.mu_0_std=num2cell(T1.mu_0_std);
 for n3=1:length(a3)
-T1.mu0{a3(n3)}={'n/d'};
-T1.mu0_std{a3(n3)}={'n/d'};
+T1.mu_0{a3(n3)}={'n/d'};
+T1.mu_0_std{a3(n3)}={'n/d'};
 end
 
 % 4) if temp_diff (temperature difference between sampling temperature and 
