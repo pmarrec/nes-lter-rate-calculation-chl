@@ -41,7 +41,7 @@ Rearragement of the table by cruise, from the oldest (EN608) to the most recent 
 *Outputs: NES-LTER-chla-grazing-experiments-rates.csv file*\
 
 The **chl_grazing_experiment_rates_QC.m** Matlab file is used to Quality Check (QC) and rename of some values of the rate data based on the following criteria:
-1) Change grazing rates < 0 (and g_std) to n/d
+1) Change grazing rates < 0 (and g_std) to n/d and change grazing rates = NaN to n/d
 2) Change muN = NaN (and mu_N_std) to n/n
 3) Change mu0 = NaN (and mu_N_std) to n/d. Most of the occurence are from en608,en617 and en627  </> 10 um size fractions. </> 10 um size fractions only from nutrient amended samples, so only mu_N and g, no mu_0. Note that when no nutrient limitation for >0&<200 size fraction, mu_0 can be considered equal to mu_N. For these cruise and these size fraction mu_0 = n/d. Few other occurence (5) for other cruises for the >0&<10 size fraction, because no Chl-a data with QC = 1 for these samples
 4) if temp_diff (temperature difference between sampling temperature and temperature in incubator <-4oC or > 4oC, iode_quality_flag (QC flag) = 3 (questionable)
