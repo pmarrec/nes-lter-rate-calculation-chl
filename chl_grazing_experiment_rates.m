@@ -56,7 +56,7 @@
 clearvars, clc, close all
 
 % Set the directory where we work
-rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\';
+rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\DataPackage_GFF_and_10um\';
 % Set the directory where the input raw data are
 rep1 = strcat(rep,'chl-grazing-experiment-k-values\');
 % Set the directory where the output clean data are
@@ -182,54 +182,42 @@ for n1=1:numel(list)
                     if sum(k_dil_nan)<length(k_dil) && ...
                             (sum(k_wsw_NoN_nan)<length(k_wsw_NoN) || sum(k_wsw_N_nan)<length(k_wsw_N)) %test if k values for NoN and N treatments are available
 
-                        [h,p]=ttest2(k_wsw_N,k_wsw_NoN,'Tail','right','Vartype','unequal');%Need to define the different argument to consider in the paired t-test
-                        %                 ResultsWSW.h_ttest(n)=h;
-                        %                 ResultsWSW.p_ttest(n)=p;
+                        %Test if Nutrient limitation
+                        [h,p]=ttest2(k_wsw_N,k_wsw_NoN,'Tail','right','Vartype','equal');%Need to define the different argument to consider in the paired t-test
 
                         if h==0%No nutrient Limitation
 
-                            k=[k_dil;k_wsw_NoN;k_wsw_N];
-                            mdl=fitlm(d1,k);
+                             k=[k_dil;k_wsw_NoN;k_wsw_N];
+                            g=(mean(k_dil,'omitnan')-mean([k_wsw_NoN;k_wsw_N],'omitnan'))/(1-T1.dilution(B4));
 
-                            if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
-                                mu=mean(k,'omitnan');
-                                T2.mu_0(cnt1)=mu;
-                                mu_stdev=std(k,'omitnan');
-                                T2.mu_0_std(cnt1)=mu_stdev;
-                                g=0;
+                            if g<0
+                                %mu is then equal to k_100
+                                mu=mean([k_wsw_NoN;k_wsw_N],'omitnan');
+                                
+                                %test if g is significantly different from
+                                %0 with a ttest between k_dil and k_100
+                                [h1,p1]=ttest2(k_dil,[k_wsw_NoN;k_wsw_N],'Tail','both','Vartype','equal');
+                                
+                                if h1==0% No signiicant diference between k_dil and k_100
+                                    T2.grazing(cnt1)=0;%set g = 0
+                                else% Significant difference between k_dil and k_100
+                                    T2.grazing(cnt1)=g;%keep the <0 values, will be considered as non determined in the rate QC
+                                end
+
+                            else%g is positive
                                 T2.grazing(cnt1)=g;
-                                g_stdev=0;
-                                T2.grazing_std(cnt1)=g_stdev;
-
-                            elseif mdl.Coefficients{2,1}>0%if g<0 (slope>0)
-
-                                mu=mean(k(7:18),'omitnan');%Mean value of k(1)
-                                T2.mu_0(cnt1)=mu;
-                                mu_stdev=std(k(7:18),'omitnan');%StdDev value of k(1)
-                                T2.mu_0_std(cnt1)=mu_stdev;
-                                g=(mean(k(1:6),'omitnan')-mean(k(7:18),'omitnan'))/(1-T1.dilution(B4));
-                                %g=-mdl.Coefficients{2,1};%We keep the negative g value in case
-                                T2.grazing(cnt1)=g;
-                                g_stdev=mdl.Coefficients{2,2};%Same for g StdDev
-                                T2.grazing_std(cnt1)=g_stdev;
-
-                            else %if g>0 (slope<0)
-
-                                g=(mean(k(1:6),'omitnan')-mean(k(7:18),'omitnan'))/(1-T1.dilution(B4));
-                                %g=-mdl.Coefficients{2,1};
-                                T2.grazing(cnt1)=g;% g = -slope = [k(d)-k(1)]/(1-d)
-                                mu=mean(k(7:18),'omitnan')+g;
-                                %mu=mdl.Coefficients{1,1};
-                                T2.mu_0(cnt1)=mu;% mu = y-intercept = g + average k(1)
-                                mu_stdev=std(k(7:18),'omitnan');
-                                %mu_stdev=mdl.Coefficients{1,2};
-                                T2.mu_0_std(cnt1)=mu_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
-                                g_stdev=mdl.Coefficients{2,2};
-                                T2.grazing_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
-
+                                %mu is then equal to k_100 + g
+                                mu=mean([k_wsw_NoN;k_wsw_N],'omitnan')+g;
                             end
+                            
+                            T2.mu_0(cnt1)=mu;
+                            mu_stdev=max(std(k_dil,'omitnan'),std([k_wsw_NoN;k_wsw_N],'omitnan'));
+                            %mu_stdev=mdl.Coefficients{1,2};
+                            T2.mu_0_std(cnt1)=mu_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
+                            g_stdev=mean([std(k_dil,'omitnan'),std([k_wsw_NoN;k_wsw_N],'omitnan')],'omitnan');
+                            T2.grazing_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
 
-
+                            %No-nutrietn limitation, mu_N = NaN
                             T2.mu_N(cnt1)=nan;
                             T2.mu_N_std(cnt1)=nan;
 
@@ -239,47 +227,31 @@ for n1=1:numel(list)
 
 
                             %N ammended samples are used to compute muN and g
-
                             k=[k_dil;k_wsw_N];
-                            mdl=fitlm(d2,k);
-
-                            if mdl.Coefficients{2,4}>0.05%if g=0 (pvalue(slope)>0.05)
+                            g=(mean(k_dil,'omitnan')-mean(k_wsw_N,'omitnan'))/(1-T1.dilution(B4));
+                            
+                            if g<0
+                                %mu_N = k_wsw_N
                                 muN=mean(k_wsw_N,'omitnan');
-                                T2.mu_N(cnt1)=muN;
-                                muN_stdev=std(k_wsw_N,'omitnan');
-                                T2.mu_N_std(cnt1)=muN_stdev;
-                                g=0;
+                                %test if g is significantly different from
+                                %0 with a ttest between k_dil and k_100
+                                [h1,p1]=ttest2(k_dil,k_wsw_N,'Tail','both','Vartype','equal');
+                                
+                                if h1==0% No signiicant diference between k_dil and k_100
+                                    T2.grazing(cnt1)=0;%set g = 0
+                                else% Significant difference between k_dil and k_100
+                                    T2.grazing(cnt1)=g;%keep the <0 values, will be considered as non determined in the rate QC
+                                end
+                                
+                            else%g is positive
                                 T2.grazing(cnt1)=g;
-                                g_stdev=0;
-                                T2.grazing_std(cnt1)=g_stdev;
-
-                            elseif mdl.Coefficients{2,1}>0%if g<0 (slope>0)
-
-                                muN=mean(k_wsw_N,'omitnan');%Mean value of k(1)
-                                T2.mu_N(cnt1)=muN;
-                                muN_stdev=std(k_wsw_N,'omitnan');%StdDev value of k(1)
-                                T2.mu_N_std(cnt1)=muN_stdev;
-                                g=(mean(k_dil,'omitnan')-mean(k_wsw_N,'omitnan'))/(1-T1.dilution(B4));
-                                %g=-mdl.Coefficients{2,1};%We keep the negative g value in case
-                                T2.grazing(cnt1)=g;
-                                g_stdev=mdl.Coefficients{2,2};%Same for g StdDev
-                                T2.grazing_std(cnt1)=g_stdev;
-
-                            else %if g>0 (slope<0)
-
-                                g=(mean(k_dil,'omitnan')-mean(k_wsw_N,'omitnan'))/(1-T1.dilution(B4));
-                                %g=-mdl.Coefficients{2,1};
-                                T2.grazing(cnt1)=g;% g = -slope = [k(d)-k(1)]/(1-d)
-                                mu=mean(k_wsw_N,'omitnan')+g;
-                                %mu=mdl.Coefficients{1,1};
-                                T2.mu_N(cnt1)=mu;% mu = y-intercept = g + average k(1)
-                                mu_stdev=std(k_wsw_N,'omitnan');
-                                %mu_stdev=mdl.Coefficients{1,2};
-                                T2.mu_N_std(cnt1)=mu_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
-                                g_stdev=mdl.Coefficients{2,2};
-                                T2.grazing_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
-
+                                muN=mean(k_wsw_N,'omitnan')+g;
                             end
+                            T2.mu_N(cnt1)=muN;% mu = y-intercept = g + average k(1)
+                            muN_stdev=max(std(k_dil,'omitnan'),std(k_wsw_N,'omitnan'));
+                            T2.mu_N_std(cnt1)=muN_stdev;% mu StdDev = Standard Error on y-intercept from the linear model
+                            g_stdev=mean([std(k_dil,'omitnan'),std(k_wsw_N,'omitnan')],'omitnan');
+                            T2.grazing_std(cnt1)=g_stdev;% mu StdDev = Standard Error on the slope from the linear model
 
                             clear d mdl muN muN_stdev g_stdev %We keep g for muNoN computation
 
@@ -287,8 +259,7 @@ for n1=1:numel(list)
                             %and g calculated from N amended samples
 
                             kNoN=mean(k_wsw_NoN,'omitnan');%k(1)NoN = mean of k(1)NoN (k(d) not included)
-                            kNoN_stdev=std(k_wsw_NoN,'omitnan');%StdDev value of k(1)NoN (k(d) not included)
-
+                            
                             if g<0
                                 muNoN=kNoN;
                             else
@@ -296,8 +267,9 @@ for n1=1:numel(list)
                             end
 
                             T2.mu_0(cnt1)=muNoN;
-                            T2.mu_0_std(cnt1)=kNoN_stdev;%Find a better way to estimate StdDev on muNoN
+                            T2.mu_0_std(cnt1)=max(std(k_dil,'omitnan'),std(k_wsw_NoN,'omitnan'));%Find a better way to estimate StdDev on muNoN
                         end
+
                         clear h p k_dil k_dil_nan k_wsw_NoN k_wsw_NoN_nan k_wsw_N k_wsw_N_nan g kNoN kNoN_stdev muNoN muNoN_stdev
 
                     else%Nan Values if only NaN values for k

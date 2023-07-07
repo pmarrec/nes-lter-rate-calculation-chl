@@ -16,7 +16,7 @@
 % k are caluclated from each TF values.
 % Up to 6 k (9 k values from AR66b) values are then obatined
 % for each treatment (dilution/nutrient/light) and filter type (>0&<200,
-% >10&<200, >0 and >0&<10 ).
+% >10&<200,).
 % Based on >0&200 (GFF) and >10&<200 (10um filters, u10 = up 10),
 % >0&<10 (d10 = down 10) Chl-a values are calculated and then corresponding
 % k values. For each triplicate, Chl-a d10 triplcate values are calculated
@@ -39,7 +39,7 @@
 clearvars, clc, close all
 
 % Set the directory where we work
-rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\';
+rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\DataPackage_GFF_and_10um\';
 % Set the directory where the input raw data are
 rep1 = strcat(rep,'chl-grazing-experiment-clean\');
 % Set the directory where the output clean data are
@@ -135,8 +135,8 @@ for n1=1:numel(list)
             %for each sampling depth, indetify the unique light levels
             a3=unique(T1.light_level(b2));
 
-            for n4=1:(length(a3)-1) %(-1) to don't consider Light leveles = NA (e.g. at T0)
-                %for eahc type of filter (+1 if >10&<200 roo count for
+            for n4=1:(length(a3)-1) %(-1) to don't consider Light levels = NA (e.g. at T0)
+                %for eahc type of filter (+1 if >10&<200 row count for
                 %>0&<200)
                 b3=b2 & strcmp(T1.light_level,a3(n4));
                 %for each sampling depth, indetify the unique filter sizes
@@ -277,10 +277,6 @@ for n1=1:numel(list)
                 %if >10&<200 data, consider also >0&<10 size fraction,
                 %which is obtained by the difference between >0&<200 and
                 %>10&<200.
-                %DIFFERENT FROM THE '>0&<10' FILTER_SIZE USED DURING EN668
-                %the difference between >0&<200 and
-                %>10&<200 size fraction will be named >0&<10 size_fraction
-                %instead of the previous filter type (cf end of the script)
                 if sum(ismember(a4,'>10&<200'))==1
                     cnt1 = cnt1 +1;
 
@@ -584,7 +580,6 @@ for n1=1:numel(list)
     T2.niskin=strcat(T2.niskin,"'");
 
     %Change the name of the size fractions
-    T2.size_fraction=strrep(T2.size_fraction,'>0&<10','>0&<10sf');
     s1=strcmp(T2.size_fraction,'<10');
     T2.size_fraction(s1)=strrep(T2.size_fraction(s1),'<10','>0&<10');
     

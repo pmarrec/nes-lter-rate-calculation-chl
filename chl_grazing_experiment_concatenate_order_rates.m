@@ -7,8 +7,7 @@
 % 2) rearragement of the table by cruise, from the oldest (EN608) to the most
 % recent (EN687), by inverse latitude (station nb) and by size fraction (>0&<200, >10&<200,
 % >0&<10 (from difference between >0&<200 and >10&<200 Chl-a conc),
-% >0 (no mesh, en627) and >0&<10sf (size fractionated dilution experiments
-% during en668)
+% 
 %
 % Input: CRUSIE-chl-grazing-experiments-rates.csv files
 %
@@ -24,7 +23,7 @@
 clearvars, clc, close all
 
 % Set the directory where we work
-rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\';
+rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\DataPackage_GFF_and_10um\';
 % Set the directory where the input rates data are
 rep1 = strcat(rep,'chl-grazing-experiment-rates\');
 

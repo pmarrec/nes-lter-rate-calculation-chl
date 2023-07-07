@@ -15,16 +15,15 @@
 clearvars, clc, close all
 
 % Set the directory where we work
-rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\';
+rep = 'C:\Users\pierr\Desktop\PostDoc_URI_Desktop\NES-LTER\EDI_Growth_Grazing\DataPackage_GFF_and_10um\';
 
 % Find all the *.csv files
-tablename=strcat(rep,'NES-LTER-chla-grazing-experiments-rates-qc.csv');
+tablename=strcat(rep,'NES-LTER-chla-grazing-experiments-rates-qc-no-second-niskin.csv');
 T1=readtable(tablename);
 
 % Erase the extra " ' " in T1.cast and T1.niskin
 T1.cast=erase(T1.cast,"'");
 T1.niskin=erase(T1.niskin,"'");
-T1.niskin_second_cast=erase(T1.niskin_second_cast,"'");
 
 %Save the new table csv file
 newtablename=strcat(rep,'NES-LTER-chla-grazing-experiments-rates-qc-noquote.csv');
