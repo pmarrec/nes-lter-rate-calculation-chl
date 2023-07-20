@@ -32,8 +32,6 @@ g was set to 0 when negative g values not significantly different from 0 (t-test
 Thus, the average k_N represented mu_N and the average k_NoN represented mu_0 (Murrell et al., 2002; Chen et al. 2009).\
 Negative g values, significantly different from 0 (i.e. higher growth in the WSW treatment than in the diluted) represents a violation of the method's assumption.\ 
 In such cases, g was reported as undetermined, and k in the undiluted bottles represented mu_N and mu_0. Uncertainties relative to mu_N and mu_0 were estimated from the standard deviations of the k_N and k_NoN triplicate values.\
-A significant positive slope (i.e. higher growth in the WSW treatment than in the diluted) represents a violation of the method’s assumption.\
-In such cases, g was reported as undetermined, and k in the undiluted bottles represented mu_N and mu_0. Uncertainties relative to mu_N and mu_0 were estimated from the standard deviations observed on k_N and k_NoN triplicate values.\
 *Input: CRUSIE-chl-grazing-experiments-k-values.csv files*\
 *Outputs: CRUISE-chla-grazing-experiments-rates.csv files.*\
 
