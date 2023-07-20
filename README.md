@@ -27,13 +27,13 @@ The potential for nutrient limitation was assessed by comparing apparent phytopl
 mu_N = g + k_N. \
 Otherwise, all k_N and k_NoN triplicate of replicate values were used to calculate both g and mu_0.\
 When size fractionation at 10 µm was performed only on nutrient amended samples, growth rates reported on greater than 10 µm and less than 10 µm fractions in this study were nutrient-amended growth rates (mu_N) when nutrient limitation was observed. If no nutrient limitation was observed, mu_N obtained is equivalent to mu_0.\
-The uncertainty of g estimates was quantified from the mean standard deviation of k_dil, k_NoN and k_N. \
-g was set to 0 when negative g values not significantly different from 0 (t-test between k_dil and k_N) were obtained. \
-Thus, the average k_N represented mu_N and the average k_NoN represented mu_0 (Murrell et al., 2002; Chen et al. 2009). \
-Negative g values, significantly different from 0 (i.e. higher growth in the WSW treatment than in the diluted) represents a violation of the method's assumption. \ 
-In such cases, g was reported as undetermined, and k in the undiluted bottles represented mu_N and mu_0. Uncertainties relative to mu_N and mu_0 were estimated from the standard deviations of the k_N and k_NoN triplicate values. \
-Thus, the average k_N represented mu_N and the average k_NoN represented mu_0. \
-A significant positive slope (i.e. higher growth in the WSW treatment than in the diluted) represents a violation of the method’s assumption. \
+The uncertainty of g estimates was quantified from the mean standard deviation of k_dil, k_NoN and k_N.\
+g was set to 0 when negative g values not significantly different from 0 (t-test between k_dil and k_N) were obtained.\
+Thus, the average k_N represented mu_N and the average k_NoN represented mu_0 (Murrell et al., 2002; Chen et al. 2009).\
+Negative g values, significantly different from 0 (i.e. higher growth in the WSW treatment than in the diluted) represents a violation of the method's assumption.\ 
+In such cases, g was reported as undetermined, and k in the undiluted bottles represented mu_N and mu_0. Uncertainties relative to mu_N and mu_0 were estimated from the standard deviations of the k_N and k_NoN triplicate values.\
+Thus, the average k_N represented mu_N and the average k_NoN represented mu_0.\
+A significant positive slope (i.e. higher growth in the WSW treatment than in the diluted) represents a violation of the method’s assumption.\
 In such cases, g was reported as undetermined, and k in the undiluted bottles represented mu_N and mu_0. Uncertainties relative to mu_N and mu_0 were estimated from the standard deviations observed on k_N and k_NoN triplicate values.\
 *Input: CRUSIE-chl-grazing-experiments-k-values.csv files*\
 *Outputs: CRUISE-chla-grazing-experiments-rates.csv files.*\
